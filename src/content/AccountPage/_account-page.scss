@@ -1,0 +1,18 @@
+@import './overrides.scss';
+tr.credit td {
+  color: green;
+}
+
+tr.deposit td {
+  color: red;
+}
+
+.account-page__r1 {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.accounttable {
+  padding-right: 0px;
+  padding-left: 0px;
+}
