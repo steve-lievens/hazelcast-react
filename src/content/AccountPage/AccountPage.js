@@ -8,6 +8,7 @@ class AccountPage extends React.Component {
     this.updateData = this.updateData.bind(this);
     this.handlePagination = this.handlePagination.bind(this);
     this.state = {
+      // The headers define which columns we'll show in the DataTable.
       headers: [
         {
           key: 'date',
@@ -27,7 +28,7 @@ class AccountPage extends React.Component {
         },
         {
           key: 'k_symbol',
-          header: 'K_SYMBOL',
+          header: 'COMMENT',
         },
       ],
       rows: [],
@@ -42,29 +43,33 @@ class AccountPage extends React.Component {
 
   tabletitle = 'My Transactions';
 
+  // Method called when invoking one of the pagination elements below the table
   handlePagination(event) {
+    // info coming from the paging control
     const { page, pageSize } = event;
     if (page && pageSize) {
+      // Let's print the incoming numbers for debugging purposes.
       var nrrows = this.state.rows.length;
       console.log('Page = ' + page);
       console.log('Pagesize = ' + pageSize);
       console.log('Number of rows = ' + nrrows);
 
+      // Calculate start and end row based on input
       var startRow = (page - 1) * pageSize;
       var endRow = startRow + pageSize;
+      // Cut it off at the end
       if (endRow > nrrows) endRow = nrrows;
 
+      // Print the results for debugging purposes
       console.log('Startrow = ' + startRow);
       console.log('Endrow = ' + endRow);
 
-      // Now set it up for pagination
-      console.log("This is the full data : ", this.state.rows)
-      var mydatapaged = this.state.rows.slice(
-        startRow,
-        endRow
-      );
+      // Now get the rows we need by slicing the full data set
+      console.log('This is the full data : ', this.state.rows);
+      var mydatapaged = this.state.rows.slice(startRow, endRow);
       console.log('This is the paged data : ', mydatapaged);
 
+      // And finally update the state (which will re-render the component)
       this.setState((prevState, props) => {
         return {
           page,
@@ -72,11 +77,12 @@ class AccountPage extends React.Component {
           startRow,
           endRow,
           rowsforpage: mydatapaged,
-        }
+        };
       });
     }
   }
 
+  // Helper function to sort the data on the "date" attribute
   compare(a, b) {
     const dateA = a.date;
     const dateB = b.date;
@@ -90,19 +96,31 @@ class AccountPage extends React.Component {
     return comparison;
   }
 
-  paginateData() {}
-
   updateData() {
-    //const apiUrl = 'http://localhost:8080/transaction/getByClient?key=1';
-    const apiUrl = '/transaction/getByClient?key=1';
+    // Get the data from Hazelcast
+    let accountid = '1';
 
+    // Get all the transactions from a single account
+    // FYI : in dev mode, the package.json has a proxy defined to allow to connect
+    // to another port. In this case 8080 where the quarkus client is running.
+    let apiUrl = '/transaction/getByClient?key=' + accountid;
+    console.log('Connecting to ' + apiUrl);
+
+    // Connect using the axios library.
+    // For now we get the full data set in one go.
+    // If this becomes too big, we'll need to add start and end info based on the pagination
     axios
       .get(apiUrl)
       .then(repos => {
         var mydata = repos.data;
         var x = 0;
+
+        // Data manipulation
         mydata.forEach(function(row) {
+          // We need a property called "id" for the Carbon DataTable, so adding it here
           row.id = x.toString();
+          if(row.type === "CREDIT") row.type = "CR";
+          if(row.type === "WITHDRAWAL") row.type = "WD";
           x = x + 1;
         });
 
@@ -110,11 +128,11 @@ class AccountPage extends React.Component {
         mydata.sort(this.compare);
         console.log('This is your sorted data ', mydata);
 
-        // Now set it up for pagination
+        // Now set it up for pagination based on the component state
         var mydatapaged = mydata.slice(this.state.startRow, this.state.endRow);
 
         this.setState((prevState, props) => {
-          return { rows: mydata, rowsforpage: mydatapaged }
+          return { rows: mydata, rowsforpage: mydatapaged };
         });
       })
       .catch(function(error) {
