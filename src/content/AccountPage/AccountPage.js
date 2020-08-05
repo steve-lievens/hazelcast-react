@@ -11,23 +11,31 @@ class AccountPage extends React.Component {
       // The headers define which columns we'll show in the DataTable.
       headers: [
         {
-          key: 'date',
+          key: 'DATE',
           header: 'DATE',
         },
         {
-          key: 'type',
+          key: 'TYPE',
           header: 'TYPE',
         },
         {
-          key: 'amount',
+          key: 'TRANS_ID',
+          header: 'TRANS_ID',
+        },
+        {
+          key: 'AMOUNT',
           header: 'AMOUNT',
         },
         {
-          key: 'balance',
+          key: 'BALANCE',
           header: 'BALANCE',
         },
         {
-          key: 'k_symbol',
+          key: 'OPERATION',
+          header: 'OPERATION'
+        },
+        {
+          key: 'K_SYMBOL',
           header: 'COMMENT',
         },
       ],
@@ -84,8 +92,8 @@ class AccountPage extends React.Component {
 
   // Helper function to sort the data on the "date" attribute
   compare(a, b) {
-    const dateA = a.date;
-    const dateB = b.date;
+    const dateA = a.DATE;
+    const dateB = b.DATE;
 
     let comparison = 0;
     if (dateA > dateB) {
@@ -117,10 +125,13 @@ class AccountPage extends React.Component {
 
         // Data manipulation
         mydata.forEach(function(row) {
+          console.log(row);
           // We need a property called "id" for the Carbon DataTable, so adding it here
           row.id = x.toString();
-          if(row.type === "CREDIT") row.type = "CR";
-          if(row.type === "WITHDRAWAL") row.type = "WD";
+          // Shorten the type value
+          if(row.TYPE === "CREDIT") row.TYPE = "CR";
+          if(row.TYPE === "WITHDRAWAL") row.TYPE = "WD";
+          if(row.K_SYMBOL === "null") row.K_SYMBOL = "";
           x = x + 1;
         });
 
