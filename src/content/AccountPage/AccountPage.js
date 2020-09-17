@@ -23,6 +23,10 @@ class AccountPage extends React.Component {
           header: 'TRANS_ID',
         },
         {
+          key: 'ACCOUNT_ID',
+          header: 'ACCOUNT_ID',
+        },
+        {
           key: 'AMOUNT',
           header: 'AMOUNT',
         },
@@ -38,6 +42,14 @@ class AccountPage extends React.Component {
           key: 'K_SYMBOL',
           header: 'COMMENT',
         },
+        {
+          key: 'REPLICATION_TIME',
+          header: 'REPL TIME',
+        },
+        {
+          key: 'INGEST_TIME',
+          header: 'INGEST TIME',
+        }
       ],
       rows: [],
       rowsforpage: [],
@@ -106,12 +118,11 @@ class AccountPage extends React.Component {
 
   updateData() {
     // Get the data from Hazelcast
-    let accountid = '1';
 
-    // Get all the transactions from a single account
+    // Get all the transactions from a single account (account is set in the quarkus project via env.)
     // FYI : in dev mode, the package.json has a proxy defined to allow to connect
     // to another port. In this case 8080 where the quarkus client is running.
-    let apiUrl = '/transaction/getByClient?key=' + accountid;
+    let apiUrl = '/transaction/getByClient';
     console.log('Connecting to ' + apiUrl);
 
     // Connect using the axios library.
@@ -123,6 +134,10 @@ class AccountPage extends React.Component {
         var mydata = repos.data;
         var x = 0;
 
+        // Now sort it by date
+        mydata.sort(this.compare);
+        console.log('This is your sorted data ', mydata);
+
         // Data manipulation
         mydata.forEach(function(row) {
           console.log(row);
@@ -132,12 +147,17 @@ class AccountPage extends React.Component {
           if(row.TYPE === "CREDIT") row.TYPE = "CR";
           if(row.TYPE === "WITHDRAWAL") row.TYPE = "WD";
           if(row.K_SYMBOL === "null") row.K_SYMBOL = "";
+
+          // convert the date
+          var date = new Date(row.DATE.substring(0,4),row.DATE.substring(4,5),row.DATE.substring(5,6));
+          row.DATE = date.toDateString()
+
+          // Convert the ingest time property
+          var date2 = new Date(row.INGEST_TIME);
+          row.INGEST_TIME = date2.toUTCString();
           x = x + 1;
         });
 
-        // Now sort it by date
-        mydata.sort(this.compare);
-        console.log('This is your sorted data ', mydata);
 
         // Now set it up for pagination based on the component state
         var mydatapaged = mydata.slice(this.state.startRow, this.state.endRow);
