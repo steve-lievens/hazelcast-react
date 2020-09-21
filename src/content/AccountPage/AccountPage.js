@@ -23,8 +23,8 @@ class AccountPage extends React.Component {
           header: 'TRANS_ID',
         },
         {
-          key: 'ACCOUNT_ID',
-          header: 'ACCOUNT_ID',
+          key: 'CLIENT_ID',
+          header: 'CLIENT_ID',
         },
         {
           key: 'AMOUNT',
@@ -122,7 +122,7 @@ class AccountPage extends React.Component {
     // Get all the transactions from a single account (account is set in the quarkus project via env.)
     // FYI : in dev mode, the package.json has a proxy defined to allow to connect
     // to another port. In this case 8080 where the quarkus client is running.
-    let apiUrl = '/transaction/getByClient';
+    let apiUrl = '/transaction/getByAccount';
     console.log('Connecting to ' + apiUrl);
 
     // Connect using the axios library.
