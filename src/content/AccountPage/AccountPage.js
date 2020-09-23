@@ -15,8 +15,8 @@ class AccountPage extends React.Component {
           header: 'DATE',
         },
         {
-          key: 'TYPE',
-          header: 'TYPE',
+          key: 'ROW',
+          header: 'ROW',
         },
         {
           key: 'TRANS_ID',
@@ -25,6 +25,10 @@ class AccountPage extends React.Component {
         {
           key: 'CLIENT_ID',
           header: 'CLIENT_ID',
+        },
+        {
+          key: 'TYPE',
+          header: 'TYPE',
         },
         {
           key: 'AMOUNT',
@@ -116,6 +120,20 @@ class AccountPage extends React.Component {
     return comparison;
   }
 
+  // Helper function to sort the data on the "row" attribute
+  compare2(a, b) {
+    const rowA = a.ROW;
+    const rowB = b.ROW;
+
+    let comparison = 0;
+    if (rowA > rowB) {
+      comparison = -1;
+    } else if (rowA < rowB) {
+      comparison = 1;
+    }
+    return comparison;
+  }
+
   updateData() {
     // Get the data from Hazelcast
 
@@ -135,7 +153,7 @@ class AccountPage extends React.Component {
         var x = 0;
 
         // Now sort it by date
-        mydata.sort(this.compare);
+        mydata.sort(this.compare2);
         console.log('This is your sorted data ', mydata);
 
         // Data manipulation

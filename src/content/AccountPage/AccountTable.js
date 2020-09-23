@@ -64,7 +64,7 @@ const AccountTable = ({ state, tabletitle, updateData, handlePagination }) => {
                     <TableRow
                       key={row.id}
                       className={
-                        row.cells[1].value === 'CR' ? 'credit' : 'deposit'
+                        row.cells[4].value === 'CR' ? 'credit' : 'deposit'
                       }>
                       {row.cells.map(cell => (
                         <TableCell key={cell.id}>{cell.value}</TableCell>
