@@ -5,6 +5,7 @@ import Header from './components/Header';
 import { Route, Switch } from 'react-router-dom';
 import LandingPage from './content/LandingPage';
 import AccountPage from './content/AccountPage';
+import TechPage from './content/TechPage';
 
 class App extends Component {
   render() {
@@ -15,6 +16,7 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={LandingPage} />
             <Route path="/account" component={AccountPage} />
+            <Route path="/tech" component={TechPage} />
           </Switch>
         </Content>
       </>

@@ -73,9 +73,12 @@ class TutorialHeader extends React.Component {
           />
         </div>
       </HeaderName>
-      <HeaderNavigation aria-label="Carbon Tutorial">
-        <HeaderMenuItem element={Link} to="/account">
+      <HeaderNavigation aria-label="ACME Demo">
+      <HeaderMenuItem element={Link} to="/account">
           Account Info
+        </HeaderMenuItem>
+        <HeaderMenuItem element={Link} to="/tech">
+          Tech Info
         </HeaderMenuItem>
       </HeaderNavigation>
       <HeaderGlobalBar>
