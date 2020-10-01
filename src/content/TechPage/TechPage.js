@@ -17,6 +17,40 @@ class TechPage extends React.Component {
     };
   }
 
+  clearMaps() {
+    // Call the clear map api
+    let apiUrl = '/techinfo/clearmaps';
+    console.log('Connecting to ' + apiUrl);
+
+    // Connect using the axios library.
+    // For now we get the full data set in one go.
+    // If this becomes too big, we'll need to add start and end info based on the pagination
+    axios
+      .get(apiUrl)
+      .then(repos => {
+        var mydata = repos.data;
+
+        console.log('Incoming data ', mydata);
+
+        // finally refresh
+        this.updateData();
+      })
+      .catch(function(error) {
+        if (error.response) {
+          // Request made and server responded
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+      });
+  }
+
   updateData() {
     // Get the data from Hazelcast
     let apiUrl = '/techinfo/getoverview';
@@ -29,10 +63,8 @@ class TechPage extends React.Component {
       .get(apiUrl)
       .then(repos => {
         var mydata = repos.data;
-        
 
         console.log('Incoming data ', mydata);
-
 
         this.setState((prevState, props) => {
           return { rows: mydata };
@@ -71,7 +103,10 @@ class TechPage extends React.Component {
           </div>
           <div className="bx--col-lg-16 techtable">
             <div className="refreshbutton">
-              <Button>Refresh</Button>
+              <Button onClick={() => this.updateData()}>Refresh</Button>
+              <Button kind="danger" onClick={() => this.clearMaps()}>
+                Clear Maps
+              </Button>
             </div>
           </div>
           <div className="bx--col-lg-16">
@@ -86,7 +121,9 @@ class TechPage extends React.Component {
               <StructuredListBody>
                 {this.state.rows.map(row => (
                   <StructuredListRow key={row.id}>
-                    <StructuredListCell noWrap>{row.mapname}</StructuredListCell>
+                    <StructuredListCell noWrap>
+                      {row.mapname}
+                    </StructuredListCell>
                     <StructuredListCell>{row.mapcount}</StructuredListCell>
                     <StructuredListCell>{row.mapsample}</StructuredListCell>
                   </StructuredListRow>
