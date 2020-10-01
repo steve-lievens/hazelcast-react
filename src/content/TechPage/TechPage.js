@@ -125,7 +125,7 @@ class TechPage extends React.Component {
                       {row.mapname}
                     </StructuredListCell>
                     <StructuredListCell>{row.mapcount}</StructuredListCell>
-                    <StructuredListCell>{row.mapsample}</StructuredListCell>
+                    <StructuredListCell className="wordwrap">{JSON.stringify(row.mapsample)}</StructuredListCell>
                   </StructuredListRow>
                 ))}
               </StructuredListBody>
