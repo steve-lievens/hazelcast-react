@@ -158,7 +158,7 @@ class AccountPage extends React.Component {
 
         // Data manipulation
         mydata.forEach(function(row) {
-          console.log(row);
+          // console.log(row);
           // We need a property called "id" for the Carbon DataTable, so adding it here
           row.id = x.toString();
           // Shorten the type value
