@@ -14,7 +14,7 @@ import {
   TableToolbarContent,
 } from 'carbon-components-react';
 
-const AccountTable = ({ state, tabletitle, updateData, handlePagination }) => {
+const AccountTable = ({ state, updateDataLoop, handlePagination }) => {
   return (
     <div>
       <DataTable
@@ -32,14 +32,14 @@ const AccountTable = ({ state, tabletitle, updateData, handlePagination }) => {
           onInputChange,
           selectedRows,
         }) => (
-          <TableContainer title={tabletitle}>
+          <TableContainer title={state.tableheader}>
             <TableToolbar>
               <TableToolbarContent>
                 <Button
                   tabIndex={
                     getBatchActionProps().shouldShowBatchActions ? -1 : 0
                   }
-                  onClick={() => updateData()}
+                  onClick={() => updateDataLoop()}
                   size="small"
                   kind="primary">
                   Refresh

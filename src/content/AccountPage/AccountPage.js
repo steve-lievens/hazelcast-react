@@ -5,7 +5,7 @@ import axios from 'axios';
 class AccountPage extends React.Component {
   constructor(props) {
     super(props);
-    this.updateData = this.updateData.bind(this);
+    this.updateDataLoop = this.updateDataLoop.bind(this);
     this.handlePagination = this.handlePagination.bind(this);
     this.state = {
       // The headers define which columns we'll show in the DataTable.
@@ -41,18 +41,6 @@ class AccountPage extends React.Component {
         {
           key: 'OPERATION',
           header: 'OPERATION'
-        },
-        {
-          key: 'K_SYMBOL',
-          header: 'COMMENT',
-        },
-        {
-          key: 'REPLICATION_TIME',
-          header: 'REPL TIME',
-        },
-        {
-          key: 'INGEST_TIME',
-          header: 'INGEST TIME',
         }
       ],
       rows: [],
@@ -62,10 +50,10 @@ class AccountPage extends React.Component {
       page: 1,
       pageSize: 10,
       pageSizes: [10, 20, 50],
+      tableheader: "My Transactions",
+      tablerefreshloop: false
     };
   }
-
-  tabletitle = 'My Transactions';
 
   // Method called when invoking one of the pagination elements below the table
   handlePagination(event) {
@@ -134,6 +122,48 @@ class AccountPage extends React.Component {
     return comparison;
   }
 
+  initiateHeader() {
+    let apiUrl = '/ui/getheader';
+    console.log('Connecting to ' + apiUrl);
+
+    // Connect using the axios library.
+    axios
+      .get(apiUrl)
+      .then(repos => {
+        var mydata = repos.data;
+        console.log("Table Header = " + mydata.tableheader);
+
+        this.setState((prevState, props) => {
+          return { tableheader: mydata.tableheader };
+        });
+      })
+      .catch(function(error) {
+        if (error.response) {
+          // Request made and server responded
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+      });
+  }
+
+  updateDataLoop() {
+    //this.interval = setInterval(() => this.updateData(), 1000);
+
+    if(this.interval){
+      clearInterval(this.interval);
+      this.interval = null;
+    } else {
+      this.interval = setInterval(() => this.updateData(), 1000);
+    }
+  }
+
   updateData() {
     // Get the data from Hazelcast
 
@@ -166,13 +196,23 @@ class AccountPage extends React.Component {
           if(row.TYPE === "WITHDRAWAL") row.TYPE = "WD";
           if(row.K_SYMBOL === "null") row.K_SYMBOL = "";
 
-          // convert the date
-          var date = new Date(row.DATE.substring(0,4),row.DATE.substring(4,5),row.DATE.substring(5,6));
-          row.DATE = date.toDateString()
+          // convert the date to string if number
+          if(typeof row.DATE === 'number') {
+            row.DATE = row.DATE.toString();
+          }
+
+          // convert the date if string
+          if(typeof row.DATE === 'string' || row.DATE instanceof String) {
+            var date = new Date(row.DATE.substring(0,4),row.DATE.substring(4,5),row.DATE.substring(5,6));
+            row.DATE = date.toDateString()  
+          }
 
           // Convert the ingest time property
-          var date2 = new Date(row.INGEST_TIME);
-          row.INGEST_TIME = date2.toUTCString();
+          if(typeof row.INGEST_TIME === 'string' || row.INGEST_TIME instanceof String){
+            var date2 = new Date(row.INGEST_TIME);
+            row.INGEST_TIME = date2.toUTCString();  
+          }
+
           x = x + 1;
         });
 
@@ -202,6 +242,11 @@ class AccountPage extends React.Component {
 
   componentDidMount() {
     this.updateData();
+    this.initiateHeader();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   render() {
@@ -211,8 +256,7 @@ class AccountPage extends React.Component {
           <div className="accounttable bx--col-lg-16">
             <AccountTable
               state={this.state}
-              tabletitle={this.tabletitle}
-              updateData={this.updateData}
+              updateDataLoop={this.updateDataLoop}
               handlePagination={this.handlePagination}
             />
           </div>
